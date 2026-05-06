@@ -28,6 +28,9 @@ const posts = (await getCollection('posts'))
 					posts.map((post) => (
 						<li class="post-item">
 							<a href={`/posts/${post.id}/`}>
+								{post.data.cover && (
+									<img src={post.data.cover} alt="" class="card-cover" loading="lazy" />
+								)}
 								<div class="meta">
 									<FormattedDate date={post.data.published} />
 								</div>
@@ -74,6 +77,13 @@ const posts = (await getCollection('posts'))
 	}
 	.post-item a:hover .title {
 		color: var(--color-muted);
+	}
+	.card-cover {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		display: block;
+		margin: 0 0 1em 0;
 	}
 	.meta {
 		font-size: 0.85em;
