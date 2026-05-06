@@ -18,19 +18,22 @@ type Props = CollectionEntry<'posts'>;
 
 const post = Astro.props;
 const { Content } = await render(post);
-const { title, published, updated, tags, excerpt } = post.data;
+const { title, published, updated, tags, excerpt, cover } = post.data;
 const description = excerpt ?? `${title} | ${SITE_TITLE}`;
 ---
 
 <!doctype html>
 <html lang="ja">
 	<head>
-		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
+		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} image={cover} />
 	</head>
 	<body>
 		<Header />
 		<main>
 			<article>
+				{cover && (
+					<img src={cover} alt="" class="cover" loading="eager" />
+				)}
 				<header class="post-header">
 					<div class="meta">
 						<FormattedDate date={published} />
@@ -62,6 +65,13 @@ const description = excerpt ?? `${title} | ${SITE_TITLE}`;
 </html>
 
 <style>
+	.cover {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		display: block;
+		margin: 0 0 3em 0;
+	}
 	.post-header {
 		margin-bottom: 3em;
 		padding-bottom: 2em;

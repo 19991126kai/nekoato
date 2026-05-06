@@ -4,6 +4,7 @@ published: 2026-04-15
 tags: ["本", "雑記"]
 genre: book
 excerpt: "頁の隅に折り目をつけた一冊について。仮置きの記事。"
+cover: "/covers/sample.svg"
 ---
 
 しばらく前から、寝る前に少しずつ読んでいた本がある。
