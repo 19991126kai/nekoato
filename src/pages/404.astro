@@ -1,0 +1,66 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={`見つかりません | ${SITE_TITLE}`} description="ページが見つかりませんでした。" />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="notfound">
+				<img src="/logo-cat.png" alt="" width="64" height="64" class="cat" />
+				<h1>404</h1>
+				<p class="message">ページが見つかりませんでした。</p>
+				<p class="sub">— 黒猫はどこかへ歩いて行ってしまったようです。</p>
+				<p class="back">
+					<a href="/">トップへもどる</a>
+				</p>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.notfound {
+		text-align: center;
+		padding: 4em 0;
+	}
+	.cat {
+		display: block;
+		margin: 0 auto 2em;
+		opacity: 0.85;
+	}
+	.notfound h1 {
+		font-size: 3rem;
+		margin: 0 0 1em 0;
+		letter-spacing: 0.05em;
+	}
+	.message {
+		margin: 0 0 0.5em 0;
+		font-size: 1.05rem;
+	}
+	.sub {
+		margin: 0 0 3em 0;
+		color: var(--color-muted);
+		font-size: 0.95em;
+	}
+	.back {
+		margin: 0;
+	}
+	.back a {
+		color: var(--color-fg);
+		border-bottom: 1px solid var(--color-muted);
+		text-decoration: none;
+		padding-bottom: 0.15em;
+	}
+	.back a:hover {
+		color: var(--color-muted);
+	}
+</style>
