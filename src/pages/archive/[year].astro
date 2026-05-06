@@ -1,0 +1,154 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const posts = (await getCollection('posts')).filter((post) => post.data.draft === false);
+
+	const yearMap = new Map<number, CollectionEntry<'posts'>[]>();
+	for (const post of posts) {
+		const y = post.data.published.getFullYear();
+		if (!yearMap.has(y)) yearMap.set(y, []);
+		yearMap.get(y)!.push(post);
+	}
+
+	return Array.from(yearMap.entries()).map(([year, yearPosts]) => ({
+		params: { year: String(year) },
+		props: {
+			year,
+			posts: yearPosts.sort(
+				(a, b) => b.data.published.valueOf() - a.data.published.valueOf(),
+			),
+		},
+	}));
+}
+
+interface Props {
+	year: number;
+	posts: CollectionEntry<'posts'>[];
+}
+
+const { year, posts } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead
+			title={`${year} | ${SITE_TITLE}`}
+			description={`${year}年の記事一覧 | ${SITE_TITLE}`}
+		/>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="page-header">
+				<div class="meta">アーカイブ</div>
+				<h1>{year} <span class="count">({posts.length})</span></h1>
+			</section>
+
+			<ul class="post-list">
+				{posts.map((post) => (
+					<li class="post-item">
+						<a href={`/posts/${post.id}/`}>
+							<div class="meta">
+								<FormattedDate date={post.data.published} />
+							</div>
+							<h2 class="title">{post.data.title}</h2>
+							{post.data.excerpt && <p class="excerpt">{post.data.excerpt}</p>}
+							{post.data.tags.length > 0 && (
+								<div class="tags">
+									{post.data.tags.map((tag) => (
+										<span class="tag">#{tag}</span>
+									))}
+								</div>
+							)}
+						</a>
+					</li>
+				))}
+			</ul>
+
+			<p class="back"><a href="/archive/">← アーカイブへ</a></p>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.page-header {
+		margin: 0 0 3em 0;
+		padding-bottom: 1.5em;
+		border-bottom: 1px solid var(--color-rule);
+	}
+	.page-header .meta {
+		font-size: 0.85em;
+		color: var(--color-muted);
+		letter-spacing: 0.04em;
+		margin-bottom: 0.4em;
+	}
+	.page-header h1 {
+		margin: 0;
+		font-size: 1.75rem;
+	}
+	.page-header .count {
+		font-size: 0.85em;
+		color: var(--color-muted);
+		margin-left: 0.4em;
+	}
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.post-item {
+		padding: 2em 0;
+		border-top: 1px solid var(--color-rule);
+	}
+	.post-item:first-child {
+		border-top: none;
+		padding-top: 0;
+	}
+	.post-item:last-child {
+		border-bottom: 1px solid var(--color-rule);
+	}
+	.post-item a {
+		display: block;
+		text-decoration: none;
+		color: var(--color-fg);
+	}
+	.post-item a:hover .title {
+		color: var(--color-muted);
+	}
+	.meta {
+		font-size: 0.85em;
+		color: var(--color-muted);
+		letter-spacing: 0.04em;
+		margin-bottom: 0.5em;
+	}
+	.title {
+		font-size: 1.5rem;
+		margin: 0 0 0.5em 0;
+	}
+	.excerpt {
+		margin: 0 0 0.75em 0;
+		color: var(--color-muted);
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75em;
+		font-size: 0.85em;
+		color: var(--color-muted);
+	}
+	.tag {
+		display: inline-block;
+	}
+	.back {
+		margin-top: 3em;
+		font-size: 0.9em;
+	}
+</style>

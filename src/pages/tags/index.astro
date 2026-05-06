@@ -1,0 +1,94 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const posts = (await getCollection('posts')).filter((post) => post.data.draft === false);
+
+const counts = new Map<string, number>();
+for (const post of posts) {
+	for (const tag of post.data.tags) {
+		counts.set(tag, (counts.get(tag) ?? 0) + 1);
+	}
+}
+
+const tagList = Array.from(counts.entries())
+	.map(([tag, count]) => ({ tag, count }))
+	.sort((a, b) => {
+		if (b.count !== a.count) return b.count - a.count;
+		return a.tag.localeCompare(b.tag, 'ja');
+	});
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={`タグ一覧 | ${SITE_TITLE}`} description={`${SITE_TITLE} のタグ一覧`} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="page-header">
+				<h1>タグ</h1>
+			</section>
+
+			{tagList.length === 0 ? (
+				<p class="empty">タグはまだありません。</p>
+			) : (
+				<ul class="tag-list">
+					{tagList.map(({ tag, count }) => (
+						<li class="tag-item">
+							<a href={`/tags/${encodeURIComponent(tag)}/`}>
+								<span class="name">#{tag}</span>
+								<span class="count">({count})</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.page-header {
+		margin: 0 0 3em 0;
+		padding-bottom: 1.5em;
+		border-bottom: 1px solid var(--color-rule);
+	}
+	.page-header h1 {
+		margin: 0;
+		font-size: 1.75rem;
+	}
+	.empty {
+		color: var(--color-muted);
+	}
+	.tag-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5em 2em;
+	}
+	.tag-item a {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5em;
+		text-decoration: none;
+		color: var(--color-fg);
+	}
+	.tag-item a:hover .name {
+		color: var(--color-muted);
+	}
+	.name {
+		font-size: 1rem;
+	}
+	.count {
+		font-size: 0.85em;
+		color: var(--color-muted);
+	}
+</style>
